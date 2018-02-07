@@ -19,19 +19,23 @@ IF(MSVC)
   )
 ENDIF()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "Output")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "Output")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "Output")
+
 add_subdirectory(liblzf-3.6 Output/liblzf-3.6)
 add_subdirectory(RecordLib Output/RecordLib)
 
-include_directories(liblzf-3.6)
-include_directories(RecordLib)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "Output")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "Output")
-
 add_library(Open_AlteryxYXDB
   Open_AlteryxYXDB.cpp
+  Open_AlteryxYXDB.h
+  SrcLib_Replacement.h
   stdafx.cpp
+  stdafx.h
 )
+
+target_include_directories(Open_AlteryxYXDB PUBLIC liblzf-3.6)
+target_include_directories(Open_AlteryxYXDB PUBLIC RecordLib)
 
 target_link_libraries(
   Open_AlteryxYXDB
@@ -43,6 +47,7 @@ add_subdirectory(Python Output/Python)
 add_executable(Test
   Test.cpp
   stdafx.cpp
+  stdafx.h
 )
 
 target_link_libraries(Test

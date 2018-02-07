@@ -1,6 +1,7 @@
 #include "ExportPythonSDK.h"
 
 #pragma warning( push, 0 )
+#define BOOST_PYTHON_STATIC_LIB
 #include <boost\python\module.hpp>
 #include <boost\python\def.hpp>
 #include <boost\python\exception_translator.hpp>
