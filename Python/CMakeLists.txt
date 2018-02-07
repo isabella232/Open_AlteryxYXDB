@@ -23,8 +23,7 @@ target_link_libraries(
 )
 
 file(TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR} native_binary_dir)
-message(${native_binary_dir})
 
 add_custom_command(TARGET Python_AlteryxYXDB POST_BUILD
-    COMMAND copy "${native_binary_dir}\\Output\\Debug\\Python_AlteryxYXDB.dll" "${native_binary_dir}\\Output\\Debug\\Python_AlteryxYXDB.pyd"
+  COMMAND copy "${native_binary_dir}\\Output\\Debug\\Python_AlteryxYXDB.dll" "${native_binary_dir}\\Output\\Debug\\Python_AlteryxYXDB.pyd"
 )
