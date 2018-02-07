@@ -4,3 +4,5 @@ build
 *.vcxproj.user
 ipch
 x64
+.Rhistory
+.Rproj.user
