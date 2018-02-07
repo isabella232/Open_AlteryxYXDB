@@ -17,7 +17,7 @@ target_include_directories(Python_AlteryxYXDB PRIVATE ${BOOST_INCLUDEDIR})
 
 target_link_libraries(
   Python_AlteryxYXDB
-  RecordLib
+  Open_AlteryxYXDB
   ${PYTHON_LIBRARIES}/python36.lib
   ${BOOST_LIBRARYDIR}/libboost_python-vc140-mt-gd-1_62.lib
 )

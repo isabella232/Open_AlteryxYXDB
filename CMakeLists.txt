@@ -34,8 +34,8 @@ add_library(Open_AlteryxYXDB
   stdafx.h
 )
 
-target_include_directories(Open_AlteryxYXDB PUBLIC liblzf-3.6)
 target_include_directories(Open_AlteryxYXDB PUBLIC RecordLib)
+target_include_directories(Open_AlteryxYXDB PUBLIC liblzf-3.6)
 
 target_link_libraries(
   Open_AlteryxYXDB

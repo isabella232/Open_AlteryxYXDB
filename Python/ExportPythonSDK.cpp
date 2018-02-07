@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "ExportPythonSDK.h"
 
 #pragma warning( push, 0 )

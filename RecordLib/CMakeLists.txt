@@ -12,4 +12,5 @@ add_library(RecordLib
   RecordObj.h
 )
 
+target_include_directories(RecordLib PUBLIC liblzf-3.6)
 target_link_libraries(RecordLib liblzf-3.6)
