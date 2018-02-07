@@ -88,6 +88,7 @@ namespace SRC
 				{
 					assert(m_nInBufferUsed<=BufferSize);
 					unsigned nResultBytes = m_nInBufferUsed;
+#pragma warning ( suppress: 4127 )
 					if (BufferSize<=0x7fff)
 					{
 						unsigned short snResultBytes = static_cast<unsigned short>(nResultBytes | 0x8000);
@@ -103,6 +104,7 @@ namespace SRC
 				else
 				{
 					assert(m_nOutBufferUsed<=BufferSize);
+#pragma warning ( suppress: 4127 )
 					if (BufferSize<=0x7fff)
 					{
 						unsigned short snResultBytes = static_cast<unsigned short>(m_nOutBufferUsed);
@@ -296,6 +298,7 @@ namespace SRC
 			{
 				unsigned nResultBytes = 0;
 				bool bUncompressed = false;
+#pragma warning( suppress: 4127 )
 				if (BufferSize<=0x7fff)
 				{
 					unsigned short snResultBytes = static_cast<unsigned short>(nResultBytes);

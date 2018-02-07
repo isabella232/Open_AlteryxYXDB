@@ -194,7 +194,7 @@ namespace Alteryx  { namespace OpenYXDB
 
 		m_bCreateMode = true;
 
-		m_header.userHdr.nMetaInfoLen = wcslen(pRecordInfoXml)+1; // +1 to write the NULL terminator for convenience
+		m_header.userHdr.nMetaInfoLen = static_cast<unsigned>(wcslen(pRecordInfoXml)+1); // +1 to write the NULL terminator for convenience
 		m_header.Write(*m_pFile);
 		m_pFile->Write(pRecordInfoXml, (m_header.userHdr.nMetaInfoLen)*sizeof(wchar_t));
 

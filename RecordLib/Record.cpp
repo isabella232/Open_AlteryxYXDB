@@ -339,14 +339,14 @@ namespace SRC
 			if (nLen==(it->name.second - it->name.first) && wcsncmp(pAttributeName, it->name.first, nLen)==0)
 			{
 				WString strRet;
-				int nLen = int(it->value.second - it->value.first);
-				if (nLen==0)
+				int nLen2 = int(it->value.second - it->value.first);
+				if (nLen2 ==0)
 					return strRet;
-				int nBytes = nLen*sizeof(*it->value.second);
-				wchar_t *pBuffer = strRet.Lock(nLen);
+				int nBytes = nLen2 *sizeof(*it->value.second);
+				wchar_t *pBuffer = strRet.Lock(nLen2);
 				memcpy(pBuffer, it->value.first, nBytes);
 
-				strRet.Unlock(nLen);
+				strRet.Unlock(nLen2);
 				return UnescapeAttribute(strRet);
 			}
 		}

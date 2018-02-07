@@ -102,7 +102,7 @@ void ReadSampleFile(const wchar_t *pFile)
 		std::cout << "\n";
 	}
 }
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 {
 	// most of the functions in this library can throw class Error if something goes wrong
 	try

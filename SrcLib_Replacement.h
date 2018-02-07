@@ -369,9 +369,8 @@ namespace SRC
 	}
 		
 // 	inline void ConvertString(WString dest, const wchar_t *p)
-	inline void ConvertString(WString &dest, const wchar_t *p, int len = -1)	// JOSH 4/4/06: made dest a ref, so this function actually does something
+	inline void ConvertString(WString &dest, const wchar_t *p, int /*len = -1*/)	// JOSH 4/4/06: made dest a ref, so this function actually does something
 	{
-		//len;
 		dest = p;
 	}
 // 	inline void ConvertString(WString dest, const char *p)
@@ -527,7 +526,7 @@ namespace SRC
 
 	namespace SHPBlob
 	{
-		template <class TFile> bool ValidateShpBlob(TFile &file, bool bFileMode = false)
+		template <class TFile> bool ValidateShpBlob(TFile &/*file*/, bool /*bFileMode*/ = false)
 		{
 			return false;
 		}
