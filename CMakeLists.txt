@@ -6,17 +6,17 @@ set(CMAKE_CXX_STANDARD 14)
 
 IF(MSVC)
   add_definitions	(
-      # /DE2
-      # /DE2WINDOWS
-      /W4 /WX /GR /EHa /MP /Gm- /J
-      /DWIN32
-      /D_WIN32
-      /D_WINDOWS
-      -D_ENABLE_ATOMIC_ALIGNMENT_FIX
-      -DNOMINMAX
-      -DUNICODE
-      -D_UNICODE
-    )
+    # /DE2
+    # /DE2WINDOWS
+    /W4 /WX /GR /EHa /MP /Gm- /J
+    /DWIN32
+    /D_WIN32
+    /D_WINDOWS
+    -D_ENABLE_ATOMIC_ALIGNMENT_FIX
+    -DNOMINMAX
+    -DUNICODE
+    -D_UNICODE
+  )
 ENDIF()
 
 add_subdirectory(liblzf-3.6 Output/liblzf-3.6)
@@ -36,8 +36,9 @@ add_library(Open_AlteryxYXDB
 target_link_libraries(
   Open_AlteryxYXDB
   RecordLib
-  liblzf-3.6
 )
+
+add_subdirectory(Python Output/Python)
 
 add_executable(Test
   Test.cpp
@@ -45,7 +46,5 @@ add_executable(Test
 )
 
 target_link_libraries(Test
-  liblzf-3.6
-  RecordLib
   Open_AlteryxYXDB
 )
