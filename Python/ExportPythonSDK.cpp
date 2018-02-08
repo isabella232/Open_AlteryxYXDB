@@ -56,6 +56,13 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 	using namespace boost::python;
 	using Alteryx::OpenYXDB::Open_AlteryxYXDB;
 	using boost::shared_ptr;
+
+	const auto translator = [](const SRC::Error& e)
+	{
+		PyErr_SetString(PyExc_RuntimeError, SRC::ConvertToAString(e.GetErrorDescription()));
+	};
+
+	register_exception_translator<SRC::Error>(translator);
 	
 	enum_<SRC::E_FieldType>("FieldType")
 		.value("unknown", SRC::E_FT_Unknown)
