@@ -1,4 +1,5 @@
 #include "../stdafx.h"
+#include "../Open_AlteryxYXDB.h"
 
 #include "ExportPythonSDK.h"
 
@@ -43,14 +44,28 @@ public:
 	print_method(boost::python::str name);
 };
 
+struct AlteryxYXDB
+{
+  Alteryx::OpenYXDB::Open_AlteryxYXDB m_alteryxYXDB;
+
+  void create(boost::python::str filename, boost::python::str xml) {
+    const char *const utf8_filename = boost::python::extract<const char *const>(filename);
+    const char *const utf8_xml = boost::python::extract<const char *const>(xml);
+
+    m_alteryxYXDB.Create(SRC::ConvertToWString(utf8_filename), SRC::ConvertToWString(utf8_xml));
+  }
+};
+
 BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 {
 	using namespace boost::python;
+	using Alteryx::OpenYXDB::Open_AlteryxYXDB;
+	using boost::shared_ptr;
 	def("yay", yay);
 
 	class_<SRC::RecordData>("record_ref", no_init);
 
-	class_<RecordCreator, boost::shared_ptr<RecordCreator>>("RecordCreator", no_init)
+	class_<RecordCreator, shared_ptr<RecordCreator>>("RecordCreator", no_init)
 		.def(
 			"finalize_record", &RecordCreator::FinalizeRecord
 			, "Returns the RecordRef that contains the data for the record."
@@ -136,7 +151,7 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 		)
 	;
 
-	class_<RecordInfo, boost::shared_ptr<RecordInfo>>("record_info")
+	class_<RecordInfo, shared_ptr<RecordInfo>>("record_info")
 		.def("__len__", &RecordInfo::NumFields)
 		.def("num_fields", &RecordInfo::NumFields)
 		.def("__getitem__", &RecordInfo::At)
@@ -147,9 +162,13 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 		.def("init_from_xml", &RecordInfo::InitFromXml)
 		.def("construct_record_creator", &RecordInfo::ConstructRecordCreator)
 		.def("get_field_num", &RecordInfo::GetFieldNum)
-		.def("get_field_by_name", &RecordInfo::GetFieldByName);
+		.def("get_field_by_name", &RecordInfo::GetFieldByName)
+	;
 
-	boost::python::class_<foo, boost::shared_ptr<foo>>("foo")
+	class_<AlteryxYXDB, boost::noncopyable>("AlteryxYXDB")
+		.def("create", &AlteryxYXDB::create);
+
+	class_<foo, shared_ptr<foo>>("foo")
 		.def("int_method", &foo::int_method)
 		.def("str_method", &foo::str_method)
 		.def("print_method", &foo::print_method);
