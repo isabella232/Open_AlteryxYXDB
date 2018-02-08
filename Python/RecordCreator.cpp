@@ -11,7 +11,7 @@ RecordCreator::RecordCreator(SmartPointerRefObj<SRC::Record> record)
 {
 }
 
-const RecordData* const
+const RecordData*
 RecordCreator::FinalizeRecord() const
 {
 	return m_ptrRecord->GetRecord();

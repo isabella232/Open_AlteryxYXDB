@@ -21,3 +21,5 @@
 #include <string>
 #include <algorithm>
 #include "SrcLib_Replacement.h"
+
+#define BOOST_PYTHON_STATIC_LIB

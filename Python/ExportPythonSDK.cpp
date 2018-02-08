@@ -68,6 +68,7 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 	class_<RecordCreator, shared_ptr<RecordCreator>>("RecordCreator", no_init)
 		.def(
 			"finalize_record", &RecordCreator::FinalizeRecord
+			, return_value_policy<reference_existing_object>()
 			, "Returns the RecordRef that contains the data for the record."
 		)
 		.add_property(
@@ -86,7 +87,6 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 		.add_property("type", &Field::Type, "The type of the field.")
 		.add_property("scale", &Field::Scale, "The scale of the field.")
 		.add_property("name", &Field::Name, "The name of the field.")
-		.add_property("position", &Field::Position, "The 0-based index of the field in its parent RecordInfo.")
 		.add_property("source", &Field::Source, "The source of the field.")
 		.add_property("description", &Field::Description, "The description of the field.")
 		.def(

@@ -48,9 +48,6 @@ public:
 	boost::python::str
   Name() const;
 	
-  int32_t
-  Position() const;
-	
   boost::python::str
   Source() const;
 
