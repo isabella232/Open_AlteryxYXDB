@@ -1,6 +1,8 @@
 #include "../stdafx.h"
+#include "../Open_AlteryxYXDB.h"
 
 #include "ExportPythonSDK.h"
+
 
 #pragma warning( push, 0 )
 #define BOOST_PYTHON_STATIC_LIB
@@ -39,12 +41,35 @@ public:
 	print_method(boost::python::str name);
 };
 
+struct AlteryxYXDB
+{
+  Alteryx::OpenYXDB::Open_AlteryxYXDB m_alteryxYXDB;
+
+  void create(boost::python::str filename, boost::python::str xml) {
+    const char *const utf8_filename = boost::python::extract<const char *const>(filename);
+    const char *const utf8_xml = boost::python::extract<const char *const>(xml);
+
+    m_alteryxYXDB.Create(SRC::ConvertToWString(utf8_filename), SRC::ConvertToWString(utf8_xml));
+  }
+};
+
+struct RecordInfo
+{
+  SRC::RecordInfo m_recordInfo;
+};
+
 BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 {
 	using namespace boost::python;
 	def("yay", yay);
 
-	boost::python::class_<foo, boost::shared_ptr<foo>>("foo")
+  using Alteryx::OpenYXDB::Open_AlteryxYXDB;
+  using boost::shared_ptr;
+
+  class_<AlteryxYXDB, boost::noncopyable>("AlteryxYXDB")
+    .def("create", &AlteryxYXDB::create);
+
+	class_<foo, shared_ptr<foo>>("foo")
 		.def("int_method", &foo::int_method)
 		.def("str_method", &foo::str_method)
 		.def("print_method", &foo::print_method);
