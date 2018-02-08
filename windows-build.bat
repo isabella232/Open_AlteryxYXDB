@@ -13,6 +13,7 @@ set BOOST_ROOT_DIR=%S_ROOT%/3rdParty/Utility/boost_1_62_0
 set PYTHON_ROOT=%S_ROOT%/3rdParty/Python/Miniconda3
 
 CMake -G "Visual Studio 14 2015 Win64" ../.. ^
+-DAYX_ROOT_DIR=%S_ROOT% ^
 -DBOOST_ROOT_DIR=%BOOST_ROOT_DIR% ^
 -DBOOST_INCLUDEDIR=%BOOST_ROOT_DIR% ^
 -DBOOST_LIBRARYDIR=%BOOST_ROOT_DIR%/stage/lib_x64/lib ^

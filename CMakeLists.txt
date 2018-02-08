@@ -43,6 +43,7 @@ target_link_libraries(
 )
 
 add_subdirectory(Python Output/Python)
+add_subdirectory(Node.js Output/Node.js)
 
 add_executable(Test
   Test.cpp
