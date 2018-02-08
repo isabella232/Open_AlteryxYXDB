@@ -1,2 +1,0 @@
-PKG_LIBS=-I/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include
-PKG_CPPFLAGS=-I/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include
