@@ -2,8 +2,14 @@ cmake_minimum_required(VERSION 3.9.1)
 
 add_library(Python_AlteryxYXDB SHARED
   DllExport.h
-  ExportPythonSDK.h
   ExportPythonSDK.cpp
+  ExportPythonSDK.h
+  Field.cpp
+  Field.h
+  RecordCreator.cpp
+  RecordCreator.h
+  RecordInfo.cpp
+  RecordInfo.h
 )
 
 find_package(PythonLibs 3.6 REQUIRED)
