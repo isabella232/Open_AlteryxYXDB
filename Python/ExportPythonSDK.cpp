@@ -26,11 +26,6 @@ using std::cout;
 using std::cerr;
 using std::wcerr;
 
-char const* yay()
-{
-  return "Yay!";
-}
-
 class foo
 {
 public:
@@ -61,7 +56,27 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 	using namespace boost::python;
 	using Alteryx::OpenYXDB::Open_AlteryxYXDB;
 	using boost::shared_ptr;
-	def("yay", yay);
+	
+	enum_<SRC::E_FieldType>("FieldType")
+		.value("unknown", SRC::E_FT_Unknown)
+		.value("bool", SRC::E_FT_Bool)
+		.value("byte", SRC::E_FT_Byte)
+		.value("int16", SRC::E_FT_Int16)
+		.value("int32", SRC::E_FT_Int32)
+		.value("int64", SRC::E_FT_Int64)
+		.value("fixeddecimal", SRC::E_FT_FixedDecimal)
+		.value("float", SRC::E_FT_Float)
+		.value("double", SRC::E_FT_Double)
+		.value("string", SRC::E_FT_String)
+		.value("wstring", SRC::E_FT_WString)
+		.value("v_string", SRC::E_FT_V_String)
+		.value("v_wstring", SRC::E_FT_V_WString)
+		.value("date", SRC::E_FT_Date)
+		.value("time", SRC::E_FT_Time)
+		.value("datetime", SRC::E_FT_DateTime)
+		.value("blob", SRC::E_FT_Blob)
+		.value("spatialobj", SRC::E_FT_SpatialObj)
+	;
 
 	class_<SRC::RecordData>("record_ref", no_init);
 
