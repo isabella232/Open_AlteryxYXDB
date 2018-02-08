@@ -1,0 +1,13 @@
+{
+  "main": "lib/binding.js",
+  "dependencies": {},
+  "scripts": {
+    "test": "node --napi-modules ./test/test_binding.js"
+  },
+  "gypfile": true,
+  "name": "n-api-sandbox",
+  "version": "1.0.0",
+  "author": "alteryx",
+  "license": "ISC",
+  "description": ""
+}
