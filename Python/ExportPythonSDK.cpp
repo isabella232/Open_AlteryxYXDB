@@ -56,7 +56,7 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 	using namespace boost::python;
 	using Alteryx::OpenYXDB::Open_AlteryxYXDB;
 	using boost::shared_ptr;
-	
+
 	enum_<SRC::E_FieldType>("FieldType")
 		.value("unknown", SRC::E_FT_Unknown)
 		.value("bool", SRC::E_FT_Bool)
@@ -172,7 +172,10 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 		.def("__getitem__", &RecordInfo::At)
 		.def("at", &RecordInfo::At)
 		.def("add_field_from_xml", &RecordInfo::AddFieldFromXml)
-		.def("add_field", &RecordInfo::AddField)
+		.def(
+      "add_field", &RecordInfo::AddField
+      , (arg("field_name"), arg("field_type"), arg("size")=0, arg("scale")=0, arg("source")="", arg("description")="")
+    )
 		.def("get_record_xml_meta_data", &RecordInfo::GetRecordXmlMetaData)
 		.def("init_from_xml", &RecordInfo::InitFromXml)
 		.def("construct_record_creator", &RecordInfo::ConstructRecordCreator)
