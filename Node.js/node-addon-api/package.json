@@ -1,0 +1,38 @@
+{
+  "bugs": {
+    "url": "https://github.com/nodejs/node-addon-api/issues"
+  },
+  "contributors": [
+    "Anna Henningsen (https://github.com/addaleax)",
+    "Arunesh Chandra (https://github.com/aruneshchandra)",
+    "Benjamin Byholm (https://github.com/kkoopa)",
+    "Gabriel Schulhof (https://github.com/gabrielschulhof)",
+    "Hitesh Kanwathirtha (https://github.com/digitalinfinity)",
+    "Jason Ginchereau (https://github.com/jasongin)",
+    "Michael Dawson (https://github.com/mhdawson)",
+    "Sampson Gao (https://github.com/sampsongao)",
+    "Taylor Woll (https://github.com/boingoing)"
+  ],
+  "dependencies": {},
+  "description": "Node.js API (N-API)",
+  "devDependencies": {
+    "safe-buffer": "^5.1.1"
+  },
+  "directories": {},
+  "homepage": "https://github.com/nodejs/node-addon-api",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "node-addon-api",
+  "optionalDependencies": {},
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nodejs/node-addon-api.git"
+  },
+  "scripts": {
+    "pretest": "node-gyp rebuild -C test",
+    "test": "node test",
+    "doc": "doxygen doc/Doxyfile"
+  },
+  "version": "1.0.0"
+}
