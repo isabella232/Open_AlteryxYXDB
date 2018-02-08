@@ -1,4 +1,4 @@
-const NApiSandbox = require("../lib/binding.js");
+const NApiSandbox = require("../lib/binding.js").NApiSandbox;
 const assert = require("assert");
 
 assert(NApiSandbox, "The expected module is undefined");

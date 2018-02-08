@@ -1,32 +1,29 @@
 #pragma once
 
 #pragma warning( push, 0 )
+#include "../SrcLib_Replacement.h"
+#include "../RecordLib/Record.h"
 #include <napi.h>
 #pragma warning( pop )
 
-#include <thread>
+namespace node {
 
-class NApiSandbox : public Napi::ObjectWrap<NApiSandbox>
+class RecordInfo : public Napi::ObjectWrap<RecordInfo>
 {
+	SRC::RecordInfo m_recordInfo;
+
 public:
 	static void
-	Initialize(Napi::Env&, Napi::Object&);
+		Initialize(Napi::Env&, Napi::Object&);
 
-	NApiSandbox(const Napi::CallbackInfo&);
-	~NApiSandbox();
+	RecordInfo(const Napi::CallbackInfo&);
+	~RecordInfo();
 
-#ifndef CALLBACKMETHOD
 	void
-	Greet(const Napi::CallbackInfo&);
-#endif
+		AddField(const Napi::CallbackInfo&);
 
-#ifdef CALLBACKMETHOD
-	void
-	Greet(const Napi::CallbackInfo&);
-#endif
-
-private:
-	Napi::ObjectReference _greeterName;
-
-	std::thread executor;
+	Napi::Value
+		GetRecordXmlMetaData(const Napi::CallbackInfo&);
 };
+
+}
