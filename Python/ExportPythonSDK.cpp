@@ -49,6 +49,16 @@ struct AlteryxYXDB
 
     m_alteryxYXDB.Create(SRC::ConvertToWString(utf8_filename), SRC::ConvertToWString(utf8_xml));
   }
+
+  void append(SRC::RecordData *record_data) {
+    m_alteryxYXDB.AppendRecord(record_data);
+  }
+
+  void open(boost::python::str filename) {
+    const char *const utf8_filename = boost::python::extract<const char *const>(filename);
+    m_alteryxYXDB.Open(SRC::ConvertToWString(utf8_filename));
+  }
+
 };
 
 BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
@@ -183,7 +193,10 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
       "add_field", &RecordInfo::AddField
       , (arg("field_name"), arg("field_type"), arg("size")=0, arg("scale")=0, arg("source")="", arg("description")="")
     )
-		.def("get_record_xml_meta_data", &RecordInfo::GetRecordXmlMetaData)
+		.def(
+      "get_record_xml_meta_data", &RecordInfo::GetRecordXmlMetaData
+      , arg("bIncludeSource")=true
+    )
 		.def("init_from_xml", &RecordInfo::InitFromXml)
 		.def("construct_record_creator", &RecordInfo::ConstructRecordCreator)
 		.def("get_field_num", &RecordInfo::GetFieldNum)
@@ -191,12 +204,18 @@ BOOST_PYTHON_MODULE(Python_AlteryxYXDB)
 	;
 
 	class_<AlteryxYXDB, boost::noncopyable>("AlteryxYXDB")
-		.def("create", &AlteryxYXDB::create);
+		.def("create", &AlteryxYXDB::create)
+		.def("open", &AlteryxYXDB::open)
+    .def("append_record", &AlteryxYXDB::append)
+  ;
+
 
 	class_<foo, shared_ptr<foo>>("foo")
 		.def("int_method", &foo::int_method)
 		.def("str_method", &foo::str_method)
-		.def("print_method", &foo::print_method);
+		.def("print_method", &foo::print_method)
+  ;
+
 }
 
 int
