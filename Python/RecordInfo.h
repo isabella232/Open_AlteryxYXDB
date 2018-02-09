@@ -31,7 +31,7 @@ public:
 
 	Field
   AddFieldFromXml(raw_utf8_str strXmlTagField, raw_utf8_str strNamePrefix = nullptr);
-	
+
   Field
   AddField(
 		raw_utf8_str strFieldName
@@ -44,16 +44,17 @@ public:
 
 	boost::python::str
   GetRecordXmlMetaData(bool bIncludeSource = true) const;
-	
+
   void
   InitFromXml(raw_utf8_str strXmlTag, raw_utf8_str strNamePrefix = nullptr);
 
 	boost::shared_ptr<RecordCreator>
   ConstructRecordCreator() const;
-	
+
 	int32_t
   GetFieldNum(raw_utf8_str strField, bool bThrowError = true) const;
-  
+
   boost::python::object // ConstField or Python None
 	GetFieldByName(raw_utf8_str strField, bool bThrowError = true) const;
+
 };
