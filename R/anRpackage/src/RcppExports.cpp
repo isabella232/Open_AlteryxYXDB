@@ -15,9 +15,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// writeSampleFile
+void writeSampleFile(SEXP fileName);
+RcppExport SEXP _anRpackage_writeSampleFile(SEXP fileNameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type fileName(fileNameSEXP);
+    writeSampleFile(fileName);
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_anRpackage_rcpp_hello_world", (DL_FUNC) &_anRpackage_rcpp_hello_world, 0},
+    {"_anRpackage_writeSampleFile", (DL_FUNC) &_anRpackage_writeSampleFile, 1},
     {NULL, NULL, 0}
 };
 
