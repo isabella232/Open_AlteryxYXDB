@@ -35,276 +35,140 @@ using namespace SRC;
 	std::cout << s.str(); \
 }
 
-//void
-//NApiSandbox::Initialize(Napi::Env &env, Napi::Object &target) {
-//	Napi::Function constructor = DefineClass(env, "NApiSandbox", {
-//		InstanceMethod("greet", &NApiSandbox::Greet)
-//	});
-//
-//	target.Set("NApiSandbox", constructor);
-//}
-//
-//#define CHECK_STATUS(status, env, msg) \
-//{ \
-//	if (status != napi_ok) \
-//	{ \
-//		throw Napi::Error::New(env, msg); \
-//	} \
-//}
-//
-//#ifndef CALLBACKMETHOD
-//void
-//NApiSandbox::Greet(const Napi::CallbackInfo &info)
-//{
-//	DO_LOGGING("Greeting on thread " << this_thread::get_id());
-//	if (!info[0].IsString())
-//	{
-//		throw Napi::Error::New(info.Env(), "You need to introduce yourself to greet");
-//	}
-//	if (!info[1].IsFunction())
-//	{
-//		throw Napi::Error::New(info.Env(), "internal error in javascript binding; a callback must be given for resolve");
-//	}
-//	if (!info[2].IsFunction())
-//	{
-//		throw Napi::Error::New(info.Env(), "internal error in javascript binding; a callback must be given for reject");
-//	}
-//
-//	auto name{ info[0].As<Napi::String>() };
-//
-//	printf("Hello %s\n", name.Utf8Value().c_str());
-//	printf("I am %s\n", this->_greeterName.Value().ToString().Utf8Value().c_str());
-//
-//	//auto scope{ Napi::HandleScope{ info.Env() } };
-//
-//	auto rsv = info[1].As<Napi::Function>();
-//	DO_LOGGING("creating resolve and reject");
-//
-//	auto resolve{ ThreadSafeCallback(move(rsv)) };
-//	DO_LOGGING("resolve created");
-//	auto reject{ ThreadSafeCallback(info[2].As<Napi::Function>()) };
-//	DO_LOGGING("resolve and reject created");
-//
-//	executor = thread{ [/*scope = move(scope),*/ resolve = move(resolve), reject = move(reject), gn = _greeterName.Value().ToString().Utf8Value()]() mutable
-//	{
-//		try
-//		{
-//			DO_LOGGING("entering thread " << this_thread::get_id());
-//			this_thread::sleep_for(chrono::seconds{ 5 });
-//			DO_LOGGING("woke up");
-//
-//			resolve.call([gn](Napi::Env env, vector<napi_value>& values)
-//			{
-//				DO_LOGGING("resolving on thread " << this_thread::get_id());
-//				values = { Napi::String::New(env, gn) };
-//				DO_LOGGING("resolved on thread " << this_thread::get_id());
-//			});
-//		}
-//		catch(exception e)
-//		{
-//			DO_LOGGING("caught " << e.what());
-//		}
-//		catch(...)
-//		{
-//			DO_LOGGING("caught an exception in other thread...");
-//
-//			try
-//			{
-//				reject.call([](Napi::Env env, vector<napi_value>& values)
-//				{
-//					DO_LOGGING("rejecting on thread " << this_thread::get_id());
-//					values = { env.Undefined() };
-//					DO_LOGGING("rejecting on thread " << this_thread::get_id());
-//				});
-//			}
-//			catch(...)
-//			{
-//				DO_LOGGING("caught an exception attempting to reject...");
-//			}
-//		}
-//	} };
-//}
-//#endif
-//
-//#ifdef CALLBACKMETHOD
-//void
-//NApiSandbox::Greet(const Napi::CallbackInfo &info) {
-//	if (!info[0].IsString())
-//	{
-//		throw Napi::Error::New(info.Env(), "You need to introduce yourself to greet");
-//	}
-//	if (!info[1].IsFunction())
-//	{
-//		throw Napi::Error::New(info.Env(), "internal error in javascript binding; a callback must be given for resolve");
-//	}
-//	if (!info[2].IsFunction())
-//	{
-//		throw Napi::Error::New(info.Env(), "internal error in javascript binding; a callback must be given for reject");
-//	}
-//
-//	auto name{ info[0].As<Napi::String>() };
-//	printf("Hello %s\n", name.Utf8Value().c_str());
-//	printf("I am %s\n", this->_greeterName.Value().ToString().Utf8Value().c_str());
-//
-//	auto scope{ Napi::HandleScope{ info.Env() } };
-//
-//	auto resolve{ Persistent(info[1].ToObject()) };
-//
-//	auto reject{ Persistent(info[2].ToObject()) };
-//
-//	_greeterName.Ref();
-//	auto greeter_name{ _greeterName.Value() };
-//
-//	executor = thread{
-//	//	[]()
-//	//{
-//	//	DO_LOGGING("launched a thread");
-//	//	this_thread::sleep_for(chrono::seconds(5));
-//	//	DO_LOGGING("finished other thread");
-//	//} };
-//		[
-//			scope = move(scope)
-//			, resolve = move(resolve)
-//			, reject = move(reject)
-//			, greeter_name = move(greeter_name)
-//		]
-//	{
-//		try
-//		{
-//			const auto resource_name{ Napi::String::New(scope.Env(), "async promise") };
-//			auto async_context{ napi_async_context{} };
-//			{
-//				auto status{ napi_async_init(scope.Env(), nullptr, resource_name, &async_context) };
-//				if (status != napi_ok) throw Napi::Error::New(scope.Env(), "error initializing async context");
-//			}
-//
-//			auto cleanup_context = gsl::finally([&scope, async_context]
-//			{
-//				try
-//				{
-//					auto status{ napi_async_destroy(scope.Env(), async_context) };
-//					if (status != napi_ok)
-//					{
-//						DO_LOGGING("error destroying async context");
-//					}
-//					else
-//					{
-//						DO_LOGGING("successfully destroyed async context");
-//					}
-//				}
-//				catch (...)
-//				{
-//					DO_LOGGING("caught an exception while trying to destroy async context");
-//				}
-//			});
-//
-//			DO_LOGGING("entered processing thread... " << scope.Env().IsExceptionPending());
-//			//this_thread::sleep_for(chrono::seconds(12));
-//			//auto name = greeter_name.Value().ToString().Utf8Value();
-//			//DO_LOGGING("done sleeping in processing thread for " << name << " " << scope.Env().IsExceptionPending() << "...");
-//
-//			DO_LOGGING("attempting to retrieve greeter name");
-//			auto pv_name{ static_cast<napi_value>(greeter_name) };
-//			DO_LOGGING("retrieved greeter name");
-//			auto result{ napi_value{} };
-//			DO_LOGGING("attempting to make resolve callback");
-//			auto local_resolve = resolve.Value();
-//			DO_LOGGING("made local_resolve");
-//			auto status{ napi_make_callback(scope.Env(), async_context, local_resolve, local_resolve, 1, &pv_name, &result) };
-//			if (status != napi_ok)
-//			{
-//				DO_LOGGING("could not make callback to set value");
-//			}
-//			else
-//			{
-//				DO_LOGGING("made callback to set value");
-//			}
-//		}
-//		catch (Napi::Error e)
-//		{
-//			DO_LOGGING(e.Message());
-//			try
-//			{
-//				//auto error{ static_cast<napi_value>(e.Value()) };
-//				//auto result{ napi_value{} };
-//				//auto status{ napi_make_callback(scope.Env(), async_context, reject.Value(), reject.Value(), 1, &error, &result) };
-//				//if (status != napi_ok)
-//				//{
-//				//	DO_LOGGING("failed to reject promise");
-//				//}
-//				//else
-//				//{
-//				//	DO_LOGGING("rejected promise");
-//				//}
-//			}
-//			catch (...)
-//			{
-//				DO_LOGGING("caught an exception while attempting to reject JS promise!");
-//			}
-//		}
-//		catch (exception e)
-//		{
-//			DO_LOGGING(e.what());
-//		}
-//		catch (...)
-//		{
-//			DO_LOGGING("caught an exception!");
-//			try
-//			{
-//				//auto error{ napi_value{} };
-//				//auto result{ napi_value{} };
-//				//DO_LOGGING("attempting to make reject callback");
-//				//auto status{ napi_make_callback(scope.Env(), async_context, reject.Value(), reject.Value(), 1, &error, &result) };
-//				//if (status != napi_ok)
-//				//{
-//				//	DO_LOGGING("failed to reject promise");
-//				//}
-//				//else
-//				//{
-//				//	DO_LOGGING("rejected promise");
-//				//}
-//			}
-//			catch (...)
-//			{
-//				DO_LOGGING("caught an exception while attempting to reject JS promise!");
-//			}
-//		}
-//		//}();
-//	} };
-//}
-//#endif
-//
-//NApiSandbox::NApiSandbox(const Napi::CallbackInfo &info)
-//	: Napi::ObjectWrap<NApiSandbox>{info}
-//{
-//	DO_LOGGING("Constructing NApiSandbox on thread " << this_thread::get_id());
-//	if (!info[0].IsString())
-//	{
-//		throw Napi::Error::New(info.Env(), "You must name me");
-//	}
-//
-//	this->_greeterName = Persistent(info[0].ToObject());
-//}
-//
-//NApiSandbox::~NApiSandbox()
-//{
-//	DO_LOGGING("calling ~NApiSandbox" << this_thread::get_id());
-//	if (executor.joinable())
-//	{
-//		executor.join();
-//	}
-//}
-
 namespace node {
+
+std::once_flag field_once{};
+Napi::FunctionReference Field::constructor{};
+
+void
+Field::Initialize(Napi::Env &env, Napi::Object &target) {
+	std::call_once(field_once, [&env, &target]{
+		auto temp_ctor{DefineClass(env, "Field",{
+			InstanceMethod("get_field_name", &Field::GetFieldName)
+		})};
+		constructor = Persistent(temp_ctor);
+		constructor.SuppressDestruct();
+		target.Set("RecordInfo", temp_ctor);
+	});
+}
+
+Field::Field(const Napi::CallbackInfo &info)
+	: Napi::ObjectWrap<Field>{info}
+	, m_field{info[0].As<Napi::External<FieldBase>>().Data()}
+{
+}
+
+Field::~Field()
+{
+}
+
+Napi::Value
+Field::GetFieldName(const Napi::CallbackInfo &info)
+{
+	return Napi::String::New(info.Env(), ConvertToAString(m_field->GetFieldName()).c_str());
+}
+
+Napi::Value
+Field::GetAsNumber(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsNumber())
+	{
+		throw Napi::Error::New(info.Env(), "record must be passed");
+	}
+	try
+	{
+		return Napi::Number::New(
+			info.Env()
+			, m_field->GetAsDouble(reinterpret_cast<const RecordData *>(info[0].As<Napi::Number>().Int64Value())).value
+		);
+	}
+	catch (Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
+	return {};
+}
+
+void
+Field::SetFromNumber(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsObject())
+	{
+		throw Napi::Error::New(info.Env(), "record creator must be passed");
+	}
+	if (!info[1].IsNumber())
+	{
+		throw Napi::Error::New(info.Env(), "number must be passed");
+	}
+
+	try
+	{
+		m_field->SetFromDouble(
+			info[0].As<Napi::External<RecordCreator>>().Data()->m_record.Get()
+			, info[1].As<Napi::Number>().DoubleValue()
+		);
+	}
+	catch (Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
+}
+
+std::once_flag record_creator_once{};
+Napi::FunctionReference RecordCreator::constructor{};
+
+void RecordCreator::Initialize(Napi::Env &env, Napi::Object &target)
+{
+	std::call_once(record_creator_once, [&env, &target] {
+		auto ctor{ DefineClass(env, "RecordCreator",{
+			InstanceMethod("reset", &RecordCreator::Reset)
+			, InstanceMethod("finalize_record", &RecordCreator::FinalizeRecord)
+		}) };
+
+		constructor = Persistent(ctor);
+		constructor.SuppressDestruct();
+		target.Set("RecordCreator", ctor);
+	});
+}
+
+RecordCreator::RecordCreator(const Napi::CallbackInfo &info)
+	: Napi::ObjectWrap<RecordCreator>{ info }
+	, m_record{ *info[0].As<Napi::External<SmartPointerRefObj<Record>>>().Data() }
+{
+}
+
+RecordCreator::~RecordCreator() {}
+
+void
+RecordCreator::Reset(const Napi::CallbackInfo &/*info*/)
+{
+	m_record->Reset();
+}
+
+Napi::Value
+RecordCreator::FinalizeRecord(const Napi::CallbackInfo &info)
+{
+#pragma warning (suppress: 4244 )
+	return Napi::Number::New(info.Env(), reinterpret_cast<ptrdiff_t>(m_record->GetRecord()));
+}
+
+std::once_flag record_info_once{};
+Napi::FunctionReference RecordInfo::constructor{};
 
 void
 RecordInfo::Initialize(Napi::Env &env, Napi::Object &target) {
-	Napi::Function constructor = DefineClass(env, "RecordInfo", {
-		InstanceMethod("add_field", &RecordInfo::AddField)
-		, InstanceMethod("get_record_xml_meta_data", &RecordInfo::GetRecordXmlMetaData)
+	std::call_once(record_info_once, [&env, &target] {
+		auto ctor{ DefineClass(env, "RecordInfo",{
+			InstanceMethod("add_field", &RecordInfo::AddField)
+			, InstanceMethod("get_record_xml_meta_data", &RecordInfo::GetRecordXmlMetaData)
+			, InstanceMethod("get_field", &RecordInfo::GetField)
+			, InstanceMethod("get_record_creator", &RecordInfo::GetRecordCreator)
+		}) };
+		
+		constructor = Persistent(ctor);
+		constructor.SuppressDestruct();
+		target.Set("RecordInfo", ctor);
 	});
-
-	target.Set("RecordInfo", constructor);
 }
 
 RecordInfo::RecordInfo(const Napi::CallbackInfo &info)
@@ -335,16 +199,141 @@ RecordInfo::AddField(const Napi::CallbackInfo &info)
 }
 
 Napi::Value
+RecordInfo::GetField(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsNumber())
+	{
+		throw Napi::Error::New(info.Env(), "type must be passed");
+	}
+	const auto idx{ info[0].As<Napi::Number>() };
+
+	return Field::constructor.New({
+		Napi::External<FieldBase>::New(
+			info.Env()
+			, const_cast<FieldBase*>(m_recordInfo[idx.Int32Value()])
+		) 
+	});
+}
+
+Napi::Value
 RecordInfo::GetRecordXmlMetaData(const Napi::CallbackInfo &info)
 {
 	return Napi::String::New(info.Env(), ConvertToAString(m_recordInfo.GetRecordXmlMetaData()).c_str());
+}
+
+Napi::Value
+RecordInfo::GetRecordCreator(const Napi::CallbackInfo &info)
+{
+	auto record{ m_recordInfo.CreateRecord() };
+	return RecordCreator::constructor.New({
+		Napi::External<SmartPointerRefObj<Record>>::New(
+			info.Env()
+			, &record
+		)
+	});
+}
+
+std::once_flag alteryx_yxdb_once{};
+Napi::FunctionReference AlteryxYXDB::constructor{};
+
+void AlteryxYXDB::Initialize(Napi::Env &env, Napi::Object &target)
+{
+	std::call_once(alteryx_yxdb_once, [&env, &target] {
+		auto ctor{ DefineClass(env, "AlteryxYXDB",{
+			InstanceMethod("close", &AlteryxYXDB::Close)
+			, InstanceMethod("open", &AlteryxYXDB::Open)
+			, InstanceMethod("create", &AlteryxYXDB::Create)
+		}) };
+
+		constructor = Persistent(ctor);
+		constructor.SuppressDestruct();
+		target.Set("AlteryxYXDB", ctor);
+	});
+}
+
+AlteryxYXDB::AlteryxYXDB(const Napi::CallbackInfo &info)
+	: Napi::ObjectWrap<AlteryxYXDB>{ info }
+{
+}
+
+AlteryxYXDB::~AlteryxYXDB() {}
+
+void AlteryxYXDB::Close(const Napi::CallbackInfo &/*info*/)
+{
+	try
+	{
+		m_alteryxYXDB.Close();
+	}
+	catch (Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
+}
+
+void AlteryxYXDB::Open(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsString())
+	{
+		throw Napi::Error::New(info.Env(), "file name must be passed");
+	}
+	try
+	{
+		m_alteryxYXDB.Open(ConvertToWString(info[0].As<Napi::String>().Utf8Value().c_str()));
+
+	}
+	catch(Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
+}
+
+void AlteryxYXDB::Create(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsString())
+	{
+		throw Napi::Error::New(info.Env(), "file name must be passed");
+	}
+	if (!info[1].IsString())
+	{
+		throw Napi::Error::New(info.Env(), "record info XML must be passed");
+	}
+	try
+	{
+		m_alteryxYXDB.Create(
+			ConvertToWString(info[0].As<Napi::String>().Utf8Value().c_str())
+			, ConvertToWString(info[1].As<Napi::String>().Utf8Value().c_str())
+		);
+	}
+	catch (Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
+}
+
+void AlteryxYXDB::AppendRecord(const Napi::CallbackInfo &info)
+{
+	if (!info[0].IsNumber())
+	{
+		throw Napi::Error::New(info.Env(), "record must be passed");
+	}
+	try
+	{
+		m_alteryxYXDB.AppendRecord(
+			reinterpret_cast<const RecordData *>(info[0].As<Napi::Number>().Int64Value())
+		);
+	}
+	catch (Error e)
+	{
+		std::wcout << e.GetErrorDescription() << '\n';
+	}
 }
 
 }
 
 Napi::Object
 Init(Napi::Env env, Napi::Object exports) {
-	//NApiSandbox::Initialize(env, exports);
+	node::AlteryxYXDB::Initialize(env, exports);
+	node::Field::Initialize(env, exports);
 	node::RecordInfo::Initialize(env, exports);
 
 	return exports;
