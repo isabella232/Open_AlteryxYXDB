@@ -5,3 +5,7 @@ rcpp_hello_world <- function() {
     .Call(`_anRpackage_rcpp_hello_world`)
 }
 
+writeSampleFile <- function(fileName) {
+    invisible(.Call(`_anRpackage_writeSampleFile`, fileName))
+}
+
