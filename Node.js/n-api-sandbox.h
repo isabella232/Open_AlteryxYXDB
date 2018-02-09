@@ -49,6 +49,9 @@ public:
 
 	Napi::Value
 	FinalizeRecord(const Napi::CallbackInfo &info);
+
+	Napi::Value
+	Get(const Napi::CallbackInfo &info);
 };
 
 class RecordInfo : public Napi::ObjectWrap<RecordInfo>

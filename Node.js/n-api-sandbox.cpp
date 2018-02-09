@@ -45,10 +45,12 @@ Field::Initialize(Napi::Env &env, Napi::Object &target) {
 	std::call_once(field_once, [&env, &target]{
 		auto temp_ctor{DefineClass(env, "Field",{
 			InstanceMethod("get_field_name", &Field::GetFieldName)
+			, InstanceMethod("get_as_number", &Field::GetAsNumber)
+			, InstanceMethod("set_from_number", &Field::SetFromNumber)
 		})};
 		constructor = Persistent(temp_ctor);
 		constructor.SuppressDestruct();
-		target.Set("RecordInfo", temp_ctor);
+		target.Set("Field", temp_ctor);
 	});
 }
 
@@ -92,10 +94,10 @@ Field::GetAsNumber(const Napi::CallbackInfo &info)
 void
 Field::SetFromNumber(const Napi::CallbackInfo &info)
 {
-	if (!info[0].IsObject())
-	{
-		throw Napi::Error::New(info.Env(), "record creator must be passed");
-	}
+	// if (!info[0].IsObject())
+	// {
+	// 	throw Napi::Error::New(info.Env(), "record creator must be passed");
+	// }
 	if (!info[1].IsNumber())
 	{
 		throw Napi::Error::New(info.Env(), "number must be passed");
@@ -103,9 +105,14 @@ Field::SetFromNumber(const Napi::CallbackInfo &info)
 
 	try
 	{
+		auto first = info[0];
+		auto record_creator = first.As<Napi::External<SmartPointerRefObj<Record>>>();
+		auto data = record_creator.Data();
+		auto second = info[1];
+		auto number = second.As<Napi::Number>();
 		m_field->SetFromDouble(
-			info[0].As<Napi::External<RecordCreator>>().Data()->m_record.Get()
-			, info[1].As<Napi::Number>().DoubleValue()
+			data->Get()
+			, number.DoubleValue()
 		);
 	}
 	catch (Error e)
@@ -123,6 +130,7 @@ void RecordCreator::Initialize(Napi::Env &env, Napi::Object &target)
 		auto ctor{ DefineClass(env, "RecordCreator",{
 			InstanceMethod("reset", &RecordCreator::Reset)
 			, InstanceMethod("finalize_record", &RecordCreator::FinalizeRecord)
+			, InstanceMethod("get", &RecordCreator::Get)
 		}) };
 
 		constructor = Persistent(ctor);
@@ -150,6 +158,15 @@ RecordCreator::FinalizeRecord(const Napi::CallbackInfo &info)
 {
 #pragma warning (suppress: 4244 )
 	return Napi::Number::New(info.Env(), reinterpret_cast<ptrdiff_t>(m_record->GetRecord()));
+}
+
+Napi::Value
+RecordCreator::Get(const Napi::CallbackInfo &info)
+{
+	return Napi::External<SmartPointerRefObj<Record>>::New(
+		info.Env()
+		, &m_record
+	);
 }
 
 std::once_flag record_info_once{};
@@ -225,12 +242,14 @@ Napi::Value
 RecordInfo::GetRecordCreator(const Napi::CallbackInfo &info)
 {
 	auto record{ m_recordInfo.CreateRecord() };
-	return RecordCreator::constructor.New({
-		Napi::External<SmartPointerRefObj<Record>>::New(
-			info.Env()
-			, &record
-		)
+	auto external = Napi::External<SmartPointerRefObj<Record>>::New(
+		info.Env()
+		, &record
+	);
+	auto constructed = RecordCreator::constructor.New({
+		external
 	});
+	return constructed;
 }
 
 std::once_flag alteryx_yxdb_once{};
@@ -243,6 +262,7 @@ void AlteryxYXDB::Initialize(Napi::Env &env, Napi::Object &target)
 			InstanceMethod("close", &AlteryxYXDB::Close)
 			, InstanceMethod("open", &AlteryxYXDB::Open)
 			, InstanceMethod("create", &AlteryxYXDB::Create)
+			, InstanceMethod("append_record", &AlteryxYXDB::AppendRecord)
 		}) };
 
 		constructor = Persistent(ctor);
@@ -334,6 +354,7 @@ Napi::Object
 Init(Napi::Env env, Napi::Object exports) {
 	node::AlteryxYXDB::Initialize(env, exports);
 	node::Field::Initialize(env, exports);
+	node::RecordCreator::Initialize(env, exports);
 	node::RecordInfo::Initialize(env, exports);
 
 	return exports;

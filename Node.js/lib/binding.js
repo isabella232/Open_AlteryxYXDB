@@ -1,7 +1,27 @@
 const addon = require('../../build/windows/Output/Node.js/Output/Debug/NodeJS_AlteryxYXDB');
 
-function Field() {
-    var _addonInstance = new addon.Field();
+function AlteryxYXDB () {
+    var _addonInstance = new addon.AlteryxYXDB();
+
+    this.close = () => {
+        return _addonInstance.close();
+    }
+
+    this.open = (filename) => {
+        return _addonInstance.open(filename);
+    }
+
+    this.create = (file, xml) => {
+        return _addonInstance.create(file, xml);
+    }
+
+    this.append_record = (record_data) => {
+        return _addonInstance.append_record(record_data);
+    }
+}
+
+function Field(field) {
+    var _addonInstance = field;
 
     this.get_field_name = () => {
         return _addonInstance.get_field_name();
@@ -12,12 +32,12 @@ function Field() {
     }
 
     this.set_from_number = (record_creator, number) => {
-        return _addonInstance.set_from_number(record_creator, number);
+        return _addonInstance.set_from_number(record_creator.get(), number);
     }
 }
 
-function RecordCreator() {
-    var _addonInstance = new addon.RecordCreator();
+function RecordCreator(rec_cre) {
+    var _addonInstance = rec_cre;
 
     this.reset = () => {
         return _addonInstance.reset();
@@ -25,6 +45,10 @@ function RecordCreator() {
 
     this.finalize_record = () => {
         return _addonInstance.finalize_record();
+    }
+
+    this.get = () => {
+        return _addonInstance.get();
     }
 }
 
@@ -40,27 +64,11 @@ function RecordInfo() {
     }
 
     this.get_field = (idx) => {
-        return _addonInstance.get_field(idx);
+        return new Field(_addonInstance.get_field(idx));
     }
 
     this.get_record_creator = () => {
-        return _addonInstance.get_record_creator();
-    }
-}
-
-function AlteryxYXDB () {
-    var _addonInstance = new addon.AlteryxYXDB();
-
-    this.close = () => {
-        return _addonInstance.close();
-    }
-
-    this.open = (filename) => {
-        return _addonInstance.open(filename);
-    }
-
-    this.create = (file, xml) => {
-        return _addonInstance.create(file, xml);
+        return new RecordCreator(_addonInstance.get_record_creator());
     }
 }
 

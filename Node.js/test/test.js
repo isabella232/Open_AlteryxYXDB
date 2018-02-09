@@ -4,25 +4,25 @@ const RecordInfo = require("../lib/binding.js").RecordInfo;
 const YXDB = require('../lib/binding.js').AlteryxYXDB;
 
 const demo = () => {
-  const ri = new RecordInfo();
-  ri.add_field("name", 5);
-  console.log(ri.get_record_xml_meta_data());
+  const record_info = new RecordInfo();
+  record_info.add_field("count", 5);
 
-  console.log('getting a field');
-  const f = ri.get_field(0);
-  console.log("got a field; it's name is: ");
-  console.log(f.get_field_name());
-
-  const record_creator = ri.get_record_creator();
+  const count_field = record_info.get_field(0);
 
   const filename = 'D:\\Dev\\InnovationDays\\Open_AlteryxYXDB\\filename.yxdb';
   const file = new YXDB();
-  console.log('constructed a YXDB object');
-  file.create(filename, ri.get_record_xml_meta_data());
-  console.log('created YXDB file');
+  file.create(filename, record_info.get_record_xml_meta_data());
+
+  const record_creator = record_info.get_record_creator();
+
+  for(let i = 0; i < 10; ++i)
+  {
+    record_creator.reset();
+    count_field.set_from_number(record_creator, i);
+    file.append_record(record_creator.finalize_record());
+  }
+
   file.close();
-  console.log('closed YXDB file');
-  console.log('finished demo!');
 };
 
 demo();
