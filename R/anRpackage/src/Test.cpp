@@ -2,14 +2,20 @@
 #include "stdafx.h"
 #include "Record.h"
 #include "Open_AlteryxYXDB.h"
+#include <Rcpp.h>
 #include <iostream>
 #include <random>
 
 // only used for generating sample data
 SRC::AString EnglishNumber(int n);
 
-void WriteSampleFile(const wchar_t *pFile)
+// [[Rcpp::export]]
+void writeSampleFile(SEXP fileName)
 {
+  // turn fileName into const wchar_t *
+  std::wstring fName = Rcpp::as<std::wstring>(fileName);
+  const wchar_t * pFile = fName.c_str();
+
 	// the RecordInfo structure defines a record for the YXDB file.
 	SRC::RecordInfo recordInfoOut;
 
