@@ -1,0 +1,2 @@
+PKG_LIBS=-I../../.. -I../../../liblzf-3.6 -I../../../RecordLib
+PKG_CPPFLAGS=-I../../.. -I../../../liblzf-3.6 -I../../../RecordLib -std=c++11 -DUNICODE
