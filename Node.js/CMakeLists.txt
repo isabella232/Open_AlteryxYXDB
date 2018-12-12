@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.9.1)
+set( AYX_ROOT_DIR "S:\\")
+include("S:\\3rdParty\\CMakePackages\\napi-thread-safe-callback-config.cmake")
+include("S:\\3rdParty\\CMakePackages\\node-addon-api-config.cmake")
 
-find_package(node-addon-api)
-find_package(napi-thread-safe-callback)
+#find_package(node-addon-api)
+#find_package(napi-thread-safe-callback)
 
 set(SOURCES
   n-api-sandbox.cpp

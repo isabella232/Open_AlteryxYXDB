@@ -9,13 +9,16 @@
 #pragma warning( pop )
 
 namespace SRC {
-class FieldBase;
-struct RecordData;
+	class FieldBase;
+	namespace Python
+	{
+		struct ConstRecordRef;
+	}
 }
 
 namespace boost {
-template<typename T>
-class shared_ptr;
+	template<typename T>
+	class shared_ptr;
 }
 
 struct RecordCreator;
@@ -27,7 +30,7 @@ class Field
 	const SRC::FieldBase* m_ptrField{};
 
 	const SRC::FieldBase*
-  get() const;
+		get() const;
 
 	using raw_utf8_str = const char* const;
 public:
@@ -37,50 +40,50 @@ public:
 	Field(const Field&) = default;
 
 	uint32_t
-  Size() const;
-	
-  SRC::E_FieldType
-  Type() const;
-	
-  int
-  Scale() const;
+		Size() const;
+
+	SRC::E_FieldType
+		Type() const;
+
+	int
+		Scale() const;
 
 	boost::python::str
-  Name() const;
-	
-  boost::python::str
-  Source() const;
+		Name() const;
 
 	boost::python::str
-  Description() const;
+		Source() const;
+
+	boost::python::str
+		Description() const;
 
 	boost::python::object
-  GetAsBool(const SRC::RecordData *const) const;
+		GetAsBool(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetFromBool(boost::shared_ptr<RecordCreator>, bool) const;
+		SetFromBool(boost::shared_ptr<RecordCreator>, bool) const;
 
 	boost::python::object
-  GetAsInt32(const SRC::RecordData *const) const;
+		GetAsInt32(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetFromInt32(boost::shared_ptr<RecordCreator>, int32_t) const;
+		SetFromInt32(boost::shared_ptr<RecordCreator>, int32_t) const;
 
 	boost::python::object
-  GetAsInt64(const SRC::RecordData *const) const;
+		GetAsInt64(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetFromInt64(boost::shared_ptr<RecordCreator>, int64_t) const;
+		SetFromInt64(boost::shared_ptr<RecordCreator>, int64_t) const;
 
 	boost::python::object
-  GetAsDouble(const SRC::RecordData *const) const;
+		GetAsDouble(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetFromDouble(boost::shared_ptr<RecordCreator>, double) const;
+		SetFromDouble(boost::shared_ptr<RecordCreator>, double) const;
 
 	boost::python::object
-  GetAsString(const SRC::RecordData *const) const;
+		GetAsString(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetFromString(boost::shared_ptr<RecordCreator>, raw_utf8_str) const;
+		SetFromString(boost::shared_ptr<RecordCreator>, raw_utf8_str) const;
 
 	bool
-  GetNull(const SRC::RecordData *const) const;
+		GetNull(boost::shared_ptr<SRC::Python::ConstRecordRef>) const;
 	void
-  SetNull(boost::shared_ptr<RecordCreator>) const;
+		SetNull(boost::shared_ptr<RecordCreator>) const;
 };

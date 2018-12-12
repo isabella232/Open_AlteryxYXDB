@@ -23,17 +23,14 @@ class RecordInfo
 public:
 	RecordInfo();
 
-	uint32_t
-  NumFields() const;
+	uint32_t NumFields() const;
 
-	Field
-  At(uint32_t nFieldIndex);
+	Field At(uint32_t nFieldIndex);
 
-	Field
-  AddFieldFromXml(raw_utf8_str strXmlTagField, raw_utf8_str strNamePrefix = nullptr);
+	Field AddFieldFromXml(raw_utf8_str strXmlTagField, raw_utf8_str strNamePrefix = nullptr);
 
-  Field
-  AddField(
+
+  Field AddField(
 		raw_utf8_str strFieldName
 		, SRC::E_FieldType ft
 		, int32_t nSize = 0
@@ -42,19 +39,16 @@ public:
 		, raw_utf8_str strDescription = nullptr
 	);
 
-	boost::python::str
-  GetRecordXmlMetaData(bool bIncludeSource = true) const;
+	boost::python::str GetRecordXmlMetaData(bool bIncludeSource = true) const;
 
-  void
-  InitFromXml(raw_utf8_str strXmlTag, raw_utf8_str strNamePrefix = nullptr);
+  void InitFromXml(raw_utf8_str strXmlTag, raw_utf8_str strNamePrefix = nullptr);
+  
 
-	boost::shared_ptr<RecordCreator>
-  ConstructRecordCreator() const;
+	boost::shared_ptr<RecordCreator> ConstructRecordCreator() const;
 
-	int32_t
-  GetFieldNum(raw_utf8_str strField, bool bThrowError = true) const;
+	int32_t GetFieldNum(raw_utf8_str strField, bool bThrowError = true) const;
 
   boost::python::object // ConstField or Python None
-	GetFieldByName(raw_utf8_str strField, bool bThrowError = true) const;
+	  GetFieldByName(raw_utf8_str strField, bool bThrowError = true) const;
 
 };

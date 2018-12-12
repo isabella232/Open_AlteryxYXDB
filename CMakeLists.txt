@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.9.1)
-
+cmake_minimum_required(VERSION 3.13.0)
+cmake_policy(SET CMP0074 NEW)
 project(Open_AlteryxYXDB)
 
 set(CMAKE_CXX_STANDARD 14)

@@ -1,3 +1,8 @@
+// Copyright 2016, Alteryx, Inc. All rights reserved
+//
+// This file is distributed to Alteryx customers as part of the
+// Software Development Kit.
+//
 #pragma once
 #define _SCL_SECURE_NO_DEPRECATE
 #if !defined(UNICODE) 
@@ -5,6 +10,10 @@
 #endif
 #include <assert.h>
 #include <string>
+#include <cstdint>
+#include <locale>
+#include <algorithm>
+#include <functional>
 #define SRCLIB_REPLACEMENT
 
 #define	sizeofArray(a)		(sizeof(a) / sizeof(a[0]))
@@ -26,23 +35,23 @@ namespace SRC
 		return _wtof(p);
 	}
 	// these variants return the # of characters used
-	inline unsigned ConvertToDouble(const char *p, double &d, bool &)
+	inline unsigned ConvertToDouble(const char *p, double &d, bool &, char sep = NULL)
 	{
 		char *pEnd;
 		d = strtod(p, &pEnd);
 		return unsigned(pEnd-p);
 	}
-	inline unsigned ConvertToDouble(const wchar_t *p, double &d, bool &)
+	inline unsigned ConvertToDouble(const wchar_t *p, double &d, bool &, char sep = NULL)
 	{
 		wchar_t *pEnd;
 		d = wcstod(p, &pEnd);
 		return unsigned(pEnd-p);
 	}
 	template< typename CharType >
-	inline unsigned ConvertToDouble( const CharType * const data, double& outVal )
+	inline unsigned ConvertToDouble( const CharType * const data, double& outVal, char sep = '.' )
 	{
 		bool bOverflow;
-		return ConvertToDouble(data, outVal, bOverflow);
+		return ConvertToDouble(data, outVal, bOverflow, sep);
 	}
 
 	inline int ConvertToInt(const char *p)
@@ -62,9 +71,9 @@ namespace SRC
 		return _wtoi64(p);
 	}
 
-	template<class TChar, class T_char_traits = std::char_traits<TChar> >
+	template<class T_Char, class T_char_traits = std::char_traits<T_Char> >
 	class Tstr 
-		: public std::basic_string<TChar, T_char_traits>
+		: public std::basic_string<T_Char, T_char_traits>
 	{
 		static inline void Assign(char *pBuffer, int n)
 		{
@@ -91,6 +100,8 @@ namespace SRC
 			_snwprintf(pBuffer, nBufferSize, L"%.*f", iDecimals, d);
 		}
 	public:
+		typedef T_Char TChar;
+
 		inline Tstr()
 		{}
 		inline Tstr(const TChar * p)
@@ -103,6 +114,8 @@ namespace SRC
 		{ }
 
 		inline unsigned Length() const { return unsigned(std::basic_string<TChar, T_char_traits>::length()); }
+
+		inline unsigned c_strLength() const { return Length(); }
 
 		inline bool IsEmpty() const { return std::basic_string<TChar, T_char_traits>::empty(); }
 
@@ -129,7 +142,7 @@ namespace SRC
 			while(*pEnd)
 				pEnd++;
 
-			resize(pEnd-pBegin);
+			this->resize(pEnd-pBegin);
 		}
 		inline void Unlock(unsigned nLen)
 		{
@@ -158,12 +171,18 @@ namespace SRC
 			*this = buffer;
 			return *this;
 		}
+		explicit Tstr(int n) {
+			this->Assign(n);
+		}
 		inline Tstr<TChar, T_char_traits> & Assign(__int64 n)
 		{
 			TChar buffer[256];
 			Assign(buffer, n);
 			*this = buffer;
 			return *this;
+		}
+		explicit Tstr(__int64 n) {
+			this->Assign(n);
 		}
 		Tstr<TChar> & Assign(const double d)
 		{
@@ -188,6 +207,9 @@ namespace SRC
 
 			*this = buffer;
 			return *this;
+		}
+		explicit Tstr(double n) {
+			this->Assign(n);
 		}
 		inline Tstr<TChar, T_char_traits> & Assign(double d, int iDecimals)
 		{
@@ -215,9 +237,19 @@ namespace SRC
 			if (n<Length())
 				std::basic_string<TChar, T_char_traits>::resize(n);
 		}
+
+		inline void TruncatePoints(unsigned n)
+		{
+			Truncate(n);
+		}
+		inline unsigned LengthPoints() const
+		{
+			return Length();
+		}
+
 		inline void Append(const TChar *p, size_t nLen)
 		{
-			append(p, nLen);
+			this->append(p, nLen);
 		}
 		inline void Append(const TChar *p)
 		{
@@ -225,12 +257,12 @@ namespace SRC
 			while(*pEnd)
 				pEnd++;
 
-			append(p, pEnd-p);
+			this->append(p, pEnd-p);
 		}
 
 		inline Tstr<TChar, T_char_traits> & TrimLeft()
 		{
-			while (!IsEmpty() && isspace(*(std::basic_string<TChar, T_char_traits>::end() - 1)))
+			while (!IsEmpty() && std::isspace(*(std::basic_string<TChar, T_char_traits>::end() - 1), std::locale()))
 				std::basic_string<TChar, T_char_traits>::resize(std::basic_string<TChar, T_char_traits>::size() - 1);
 			return *this;
 		}
@@ -240,7 +272,7 @@ namespace SRC
 		{
 			size_t i = 0;
 			for (; i < std::basic_string<TChar, T_char_traits>::size(); i++) {
-				if (!isspace((*this)[i])) {
+				if (!std::isspace((*this)[i], std::locale())) {
 					break;
 				}
 			}
@@ -275,6 +307,109 @@ namespace SRC
 			return s;
 		}
 
+		inline static int strlen(const TChar * p)
+		{
+			const TChar *pOrig = p;
+			while (*p)
+				++p;
+			return int(p-pOrig);
+		}
+		inline static const TChar * strchr(const TChar *p, TChar c)
+		{
+			for (; *p; ++p)
+			{
+				if (*p == c)
+					return p;
+			}
+			return nullptr;
+		}
+		inline static const TChar * strstr (const TChar * str1, const TChar * str2)
+		{
+			const TChar *cp = str1;
+			const TChar *s1, *s2;
+
+			if ( !*str2 )
+				return str1;
+
+			while (*cp)
+			{
+					s1 = cp;
+					s2 = str2;
+
+					while ( *s1 && *s2 && !(*s1-*s2) )
+							s1++, s2++;
+
+					if (!*s2)
+							return(cp);
+
+					cp++;
+			}
+
+			return(NULL);
+
+		}
+
+		/** case sensitive compare, returning pA[n]-pB[n] when they're
+		* different; return zero (equal) at a null or after comparing nLength */
+		inline static int strncmp(const TChar *pA, const TChar *pB, size_t nLength)
+		{
+			if (nLength == 0)
+				return 0;
+
+			const TChar* pEnd = pA + nLength - 1;
+
+			while (*pA && (pA < pEnd) && *pA == *pB)
+				pA++, pB++;
+
+			return *(pA) - *(pB);
+		}
+
+		inline static int Tstrtol(const char *nptr, char **endptr, int base)
+		{
+			return strtol(nptr, endptr, base);
+		}
+		inline static int Tstrtol(const wchar_t *nptr, wchar_t **endptr, int base)
+		{
+			return wcstol(nptr, endptr, base);
+		}
+		inline static double Tstrtod(const char *nptr, char **endptr)
+		{
+			return strtod(nptr, endptr);
+		}
+		inline static double Tstrtod(const wchar_t *nptr, wchar_t **endptr)
+		{
+			return wcstod(nptr, endptr);
+		}
+		inline static int64_t Tstrtoll(const char *nptr, char **endptr, int base)
+		{
+			return _strtoi64(nptr, endptr, base);
+		}
+		inline static int64_t Tstrtoll(const wchar_t *nptr, wchar_t **endptr, int base)
+		{
+			return _wcstoi64(nptr, endptr, base);
+		}
+		inline static int strtoi(const char *p)
+		{
+			return atoi(p);
+		}
+		inline static int strtoi(const wchar_t *p)
+		{
+			return wcstol(p,nullptr,10);
+		}
+		/** just like strcasecmp or stricmp, for whichever kind of string you have */
+		inline static int CompareNoCase(const TChar *pA, const TChar *pB)
+		{
+			int cA, cB;
+			do
+			{
+				cA = *pA++;
+				cA = (cA>='A' && cA<='Z') ? (cA + 'a' - 'A') : cA;
+
+				cB = *pB++;
+				cB = (cB>='A' && cB<='Z') ? (cB + 'a' - 'A') : cB;
+			} while (cA && cA==cB);
+			return cA - cB;
+		}
 	};
 
 	class char_traits_no_case : public std::char_traits<wchar_t>
@@ -288,6 +423,8 @@ namespace SRC
 	typedef Tstr<char, std::char_traits<char> > AString;
 	typedef Tstr<wchar_t, std::char_traits<wchar_t> > WString;
 	typedef Tstr<wchar_t, std::char_traits<wchar_t> > String;
+	template<class TChar> WString MSG_NoXL(const TChar* msgKey, const wchar_t* a1=nullptr, const wchar_t* a2=nullptr, const wchar_t* a3=nullptr, const wchar_t* a4=nullptr);
+
 	class WStringNoCase : public Tstr<wchar_t, char_traits_no_case > 
 	{
 	public:
@@ -326,6 +463,45 @@ namespace SRC
 			return s;
 		}
 	};
+	typedef WStringNoCase StringNoCase;
+#define _U(x) L ## x
+
+
+	inline bool ConvertStringUtf8(AString &r_dest, const wchar_t *p, int len =-1, int nCodePage =28591/*Latin-1*/)
+	{
+		if (p && *p)
+		{
+			if (len<0)
+				len = int(wcslen(p));
+			// we need to reserve 3 * the characters because some conversions, namely UTF-8 can expand that much.
+			unsigned nNarrowLen = unsigned(len * 3 + 1);
+			char *pRet = r_dest.Lock(nNarrowLen);
+			//28591== ISO 8859-1 Latin I 
+			int nNewLen = ::WideCharToMultiByte(nCodePage, 0, p, len, pRet, nNarrowLen, NULL, NULL);
+			pRet[nNewLen] = NULL;
+			r_dest.Unlock(nNewLen);
+			if (0 == nNewLen)
+				return false;
+		}
+		else
+			r_dest.Truncate(0);
+		return true;
+	}
+
+	inline AString ConvertToAStringUtf8(const WString& p)
+	{
+		AString ret;
+		ConvertStringUtf8(ret, p.c_str(), p.Length(), CP_UTF8);
+		return ret;
+	}
+	inline AString ConvertToAStringUtf8(const wchar_t* p, int len = -1)
+	{
+		AString ret;
+		ConvertStringUtf8(ret, p, len, CP_UTF8);
+		return ret;
+	}
+	
+
 
 	inline void ConvertString(AString &dest, const wchar_t *p, int len = -1)
 	{
@@ -369,8 +545,9 @@ namespace SRC
 	}
 		
 // 	inline void ConvertString(WString dest, const wchar_t *p)
-	inline void ConvertString(WString &dest, const wchar_t *p, int /*len = -1*/)	// JOSH 4/4/06: made dest a ref, so this function actually does something
+	inline void ConvertString(WString &dest, const wchar_t *p, int len = -1)	// JOSH 4/4/06: made dest a ref, so this function actually does something
 	{
+		//len;
 		dest = p;
 	}
 // 	inline void ConvertString(WString dest, const char *p)
@@ -400,6 +577,19 @@ namespace SRC
 	{
 		return str;
 	}
+	
+	inline String ConvertToString(const char *p)
+	{
+		String dest;
+		ConvertString(dest, p);
+		return dest;
+	}
+	inline String ConvertToString(const wchar_t *p)
+	{
+		String dest(p);
+		return dest;
+	}
+
 	template <class TChar> class TCompare_StrCompactWhitespace
 	{
 	public:
@@ -447,20 +637,16 @@ namespace SRC
 	{
 		String m_strError;
 	public:
-		inline Error(const String &str)
-			: m_strError(str)
+		inline Error(const String &str)	: m_strError(str) /* XMSG() */
 		{
 		}
-		inline Error(const AString &str)
-			: m_strError(ConvertToWString(str.c_str()))
+		inline Error(const AString &str) : m_strError(MSG_NoXL(str.c_str()))
 		{
 		}
-		inline Error(const wchar_t *str)
-			: m_strError(ConvertToWString(str))
+		inline Error(const wchar_t *str) : m_strError(MSG_NoXL(str))
 		{
 		}
-		inline Error(const WStringNoCase &str)
-			: m_strError(ConvertToWString(str.c_str()))
+		inline Error(const WStringNoCase &str): m_strError(MSG_NoXL(str.c_str()))
 		{
 		}
 
@@ -477,12 +663,11 @@ namespace SRC
 	class ErrorUserCanceled : public Error
 	{
 	public:
-		inline ErrorUserCanceled()  
-			: Error("User Canceled")
+		inline ErrorUserCanceled()  : Error(MSG_NoXL("User Canceled"))
 		{
 		}
 
-		inline ErrorUserCanceled(const ErrorUserCanceled &e) : Error(e) { }
+//		inline ErrorUserCanceled(const ErrorUserCanceled &e) : Error(e) { }
 	}; // ErrorUserCanceled
 
 
@@ -505,7 +690,7 @@ namespace SRC
 		inline unsigned Read(void * pDest, unsigned nSize) const
 		{
 			if ((static_cast<const char *>(m_pBlobNext)+nSize)>m_pBlobEnd)
-				throw Error(_T("Internal Error: Attempt to read past the end of a blob."));
+				throw Error(MSG_NoXL("Internal Error: Attempt to read past the end of a blob."));
 
 			memcpy(pDest, m_pBlobNext, nSize);
 			m_pBlobNext = static_cast<const char *>(m_pBlobNext) + nSize;
@@ -516,7 +701,7 @@ namespace SRC
 		inline const void * Get(unsigned nSize) const
 		{
 			if ((static_cast<const char *>(m_pBlobNext)+nSize)>m_pBlobEnd)
-				throw Error(_T("Internal Error: Attempt to read past the end of a blob."));
+				throw Error(MSG_NoXL("Internal Error: Attempt to read past the end of a blob."));
 
 			const void * pRet = m_pBlobNext;
 			m_pBlobNext = static_cast<const char *>(m_pBlobNext) + nSize;
@@ -526,7 +711,7 @@ namespace SRC
 
 	namespace SHPBlob
 	{
-		template <class TFile> bool ValidateShpBlob(TFile &/*file*/, bool /*bFileMode*/ = false)
+		template <class TFile> bool ValidateShpBlob(TFile &file, bool bFileMode = false)
 		{
 			return false;
 		}
@@ -686,7 +871,7 @@ namespace SRC
 			// guard against multiple inheritance...
 			// it will also force the compiler to check if this cast is valid
 			if (static_cast<TDestDataType *>(pData)!=pData)
-				throw Error("SmartPointer Static cast is not valid for multiple inheritance.");
+				throw Error(MSG_NoXL("Internal Error: SmartPointer Static cast is not valid for multiple inheritance."));
 
 			return SmartPointerRefObj<TDestDataType>(reinterpret_cast<SmartPointerRefObj<TDestDataType> &>(*this));
 		}
@@ -719,4 +904,42 @@ namespace SRC
 			return *this;
 		}
 	};
+
+#define _GLOT_H_
+	
+	/** ModI18n changed this line, but thinks it's fine */
+	#define GlotNote
+
+	/** ModI18n changed this line, but not sure it's right */
+	#define GlotWarn
+
+	template<class TChar> WString MSG_NoXL(const TChar* msgKey, const wchar_t* a1, const wchar_t* a2, const wchar_t* a3, const wchar_t* a4)
+	{
+		const wchar_t* args[]={a1,a2,a3,a4};
+		WString msg;
+		wchar_t ch;
+		while (0 != (ch = (*msgKey++))) {
+			if (ch != '@') {
+				msg += ch;
+			}
+			else if ('1' <= *msgKey && *msgKey <= '9') {
+				int argNum= (*msgKey++) - '1';		// gives 0 to nArgs-1
+				if (argNum>=4 || !args[argNum]) {
+					((msg += L"<Missing Argument Text ") += *(msgKey-1) ) += '>';
+				} else {
+					msg += args[argNum];
+				}
+			}
+			else {
+				msg += '@';
+				if (*msgKey == '@')
+					++msgKey;	// skip a second one of them.
+			}
+		}
+		return msg;
+	}
+	template<class TChar> WString XMSG(const TChar* msgKey, const wchar_t* a1=nullptr, const wchar_t* a2=nullptr, const wchar_t* a3=nullptr, const wchar_t* a4=nullptr)
+	{
+		return MSG_NoXL(msgKey,a1,a2,a3,a4);
+	}
 }

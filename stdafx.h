@@ -20,6 +20,8 @@
 #include <memory>
 #include <string>
 #include <algorithm>
+#pragma warning( push )
+#pragma warning( disable : 4100)
 #include "SrcLib_Replacement.h"
-
+#pragma warning( pop ) 
 #define BOOST_PYTHON_STATIC_LIB

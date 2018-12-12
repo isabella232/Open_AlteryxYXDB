@@ -137,7 +137,7 @@ namespace Alteryx  { namespace OpenYXDB
 		std::unique_ptr<File_Large> m_pFile;
 
 	public:
-		RecordInfo m_recordInfo;
+		SRC::RecordInfo m_recordInfo;
 	private:
 		SmartPointerRefObj<Record> m_pRecord;
 

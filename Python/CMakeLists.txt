@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.1)
+cmake_minimum_required(VERSION 3.13.0)
 
 add_library(Python_AlteryxYXDB SHARED
   DllExport.h
@@ -12,20 +12,28 @@ add_library(Python_AlteryxYXDB SHARED
   RecordInfo.h
 )
 
-find_package(PythonLibs 3.6 REQUIRED)
-link_directories(${PYTHON_LIBRARIES})
-target_include_directories(Python_AlteryxYXDB PRIVATE ${PYTHON_INCLUDE_DIRS})
+find_package(Python3 COMPONENTS Development)
+link_directories(${Python3_LIBRARIES})
+target_include_directories(Python_AlteryxYXDB PUBLIC ${Python3_INCLUDE_DIRS})
 
-find_package(Boost)
+
+set(Boost_DEBUG 1)
+set( BOOST_ROOT "S:\\3rdParty\\Utility\\boost_1_62_0")
+set( BOOST_DIR "S:\\3rdParty\\Utility\\boost_1_62_0")
+set( BOOST_LIBRARYDIR "S:\\3rdParty\\Utility\\boost_1_62_0\\stage\\lib_x64\\lib" )
 set(Boost_USE_STATIC_LIBS ON)
-link_directories(${BOOST_LIBRARYDIR})
-target_include_directories(Python_AlteryxYXDB PRIVATE ${BOOST_INCLUDEDIR})
+find_package(Boost COMPONENTS python3)
+if(Boost_FOUND)
+	include_directories(${Boost_INCLUDE_DIR})
+endif()
+
+target_include_directories(Python_AlteryxYXDB PUBLIC ${BOOST_INCLUDEDIR})
 
 target_link_libraries(
   Python_AlteryxYXDB
   Open_AlteryxYXDB
-  ${PYTHON_LIBRARIES}/python36.lib
-  ${BOOST_LIBRARYDIR}/libboost_python-vc140-mt-gd-1_62.lib
+  ${Python3_LIBRARIES}
+  Boost::python3
 )
 
 file(TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR} native_binary_dir)

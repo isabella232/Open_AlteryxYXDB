@@ -2,6 +2,7 @@
 
 #include "Field.h"
 #include "RecordCreator.h"
+#include "RecordRef.h"
 
 #include "../SrcLib_Replacement.h"
 
@@ -72,10 +73,10 @@ return_nullable(const FieldVal& val)
 }
 
 object
-Field::GetAsBool(const RecordData *const record_ref) const
+Field::GetAsBool(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return return_nullable(get()->GetAsBool(record_ref));
+	return return_nullable(get()->GetAsBool(record_ref->m_ptrRecordData));
 }
 
 void
@@ -86,10 +87,10 @@ Field::SetFromBool(boost::shared_ptr<RecordCreator> record, const bool new_val) 
 }
 
 object
-Field::GetAsInt32(const RecordData *const record_ref) const
+Field::GetAsInt32(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return return_nullable(get()->GetAsInt32(record_ref));
+	return return_nullable(get()->GetAsInt32(record_ref->m_ptrRecordData));
 }
 
 void
@@ -100,10 +101,10 @@ Field::SetFromInt32(boost::shared_ptr<RecordCreator> record, int32_t value) cons
 }
 
 object
-Field::GetAsInt64(const RecordData *const record_ref) const
+Field::GetAsInt64(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return return_nullable(get()->GetAsInt64(record_ref));
+	return return_nullable(get()->GetAsInt64(record_ref->m_ptrRecordData));
 }
 
 void
@@ -114,10 +115,10 @@ Field::SetFromInt64(boost::shared_ptr<RecordCreator> record, int64_t value) cons
 }
 
 object
-Field::GetAsDouble(const RecordData *const record_ref) const
+Field::GetAsDouble(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return return_nullable(get()->GetAsDouble(record_ref));
+	return return_nullable(get()->GetAsDouble(record_ref->m_ptrRecordData));
 }
 
 void
@@ -141,10 +142,10 @@ return_nullable_string(const FieldVal& val)
 }
 
 object
-Field::GetAsString(const RecordData *const record_ref) const
+Field::GetAsString(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return return_nullable_string(get()->GetAsWString(record_ref));
+	return return_nullable_string(get()->GetAsWString(record_ref->m_ptrRecordData));
 }
 
 void
@@ -155,10 +156,10 @@ Field::SetFromString(boost::shared_ptr<RecordCreator> record, raw_utf8_str value
 }
 
 bool
-Field::GetNull(const RecordData *const record_ref) const
+Field::GetNull(boost::shared_ptr<SRC::Python::ConstRecordRef> record_ref) const
 {
 	assert(record_ref != nullptr);
-	return get()->GetNull(record_ref);
+	return get()->GetNull(record_ref->m_ptrRecordData);
 }
 
 void

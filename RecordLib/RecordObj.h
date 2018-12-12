@@ -13,7 +13,7 @@
 namespace SRC 
 {
 	struct RecordData
-	{ 
+	{
 	};
 
 	inline char * ToCharP(RecordData *p)
